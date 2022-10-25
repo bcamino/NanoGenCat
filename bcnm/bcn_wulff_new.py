@@ -174,18 +174,27 @@ def get_coordination(structure):
     for atom_type in np.unique(structure.atomic_numbers):
         shells.append(np.unique(np.round(structure.distance_matrix[np.where(np.array(structure.atomic_numbers) == atom_type)[0],:],4)))
 
+
     # Think about this if the structure is homogeneous
     '''if np.unique(shells,axis=0).shape[0] == 1:
         shells = np.unique(shells,axis=0)'''
 
     coord_vector  = np.zeros(structure.num_sites,dtype=int)
     
-    # This loop is slow
+    '''# This loop is slow
     
     for i,atoms in enumerate(atoms_type_site):
         for atom in atoms:
-            coord_vector[atom] = np.sum(np.round(structure.distance_matrix[atom,:],5) == shells[i][1])
+            coord_vector[atom] = np.sum(np.round(structure.distance_matrix[atom,:],5) == shells[i][1])'''
 
+    shell_1 = np.zeros((structure.num_sites,structure.num_sites))
+
+    for i,atom_type in enumerate(np.unique(structure.atomic_numbers)):
+        atom_type_pos = np.where(structure.atomic_numbers == atom_type)[0]
+        shell_1[atom_type_pos,:] = np.array(shells)[i,1]
+
+    coord_vector = np.sum(np.round(structure.distance_matrix,5) == np.round(shell_1,5),axis=1)
+    
     return coord_vector
 
 
